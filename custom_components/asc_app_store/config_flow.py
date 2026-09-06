@@ -34,7 +34,6 @@ from .const import (
     CONF_SCAN_INTERVAL,
     CONF_VENDOR_NUMBER,
     DEFAULT_SCAN_INTERVAL_MINUTES,
-    DEFAULT_VENDOR_NUMBER,
     DOMAIN,
     MAX_SCAN_INTERVAL_MINUTES,
     MIN_SCAN_INTERVAL_MINUTES,
@@ -50,7 +49,7 @@ STEP_USER_SCHEMA = vol.Schema(
         vol.Required(CONF_PRIVATE_KEY): TextSelector(
             TextSelectorConfig(multiline=True, type=TextSelectorType.TEXT)
         ),
-        vol.Required(CONF_VENDOR_NUMBER, default=DEFAULT_VENDOR_NUMBER): TextSelector(),
+        vol.Required(CONF_VENDOR_NUMBER): TextSelector(),
     }
 )
 

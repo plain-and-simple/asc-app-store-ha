@@ -60,8 +60,9 @@ In App Store Connect, open **Users and Access → Integrations → Keys** and
 create a key that can read apps and Sales and Trends (App Manager or Admin).
 Download the `.p8` file and note the **Key ID** and **Issuer ID**.
 
-The **vendor number** is under **Agreements, Tax, and Banking**. This studio
-uses `93606071`, which is the form default.
+The **vendor number** is under **Agreements, Tax, and Banking**. Enter yours
+in the setup form — there is no default. It looks like an 8-digit number
+such as `12345678`.
 
 ### 4. Add the integration
 
