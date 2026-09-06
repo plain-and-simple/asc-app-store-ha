@@ -14,7 +14,7 @@
           "key_id": "The 10-character Key ID shown next to the key in App Store Connect.",
           "issuer_id": "The Issuer ID at the top of the Keys page.",
           "private_key": "Paste the full PEM text of the AuthKey_XXXXXXXXXX.p8 file, including the BEGIN and END lines.",
-          "vendor_number": "Numeric vendor number from Agreements, Tax, and Banking. The studio default is 93606071."
+          "vendor_number": "Numeric vendor number from Agreements, Tax, and Banking (for example 12345678)."
         }
       },
       "reauth_confirm": {

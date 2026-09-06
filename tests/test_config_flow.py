@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
+import voluptuous as vol
 
+from custom_components.asc_app_store.config_flow import STEP_USER_SCHEMA
 from custom_components.asc_app_store.const import (
     API_BASE,
     CONF_ISSUER_ID,
@@ -80,6 +82,27 @@ async def test_a_bad_key_says_so_and_lets_the_user_retry(
 
     result = await hass.config_entries.flow.async_configure(flow_id, _user_input())
     assert result["type"] is FlowResultType.CREATE_ENTRY
+
+
+def test_vendor_number_is_required_with_no_default() -> None:
+    """Do not prefill anyone's real vendor number on a public form."""
+    keys = {key.schema: key for key in STEP_USER_SCHEMA.schema}
+    vendor = keys[CONF_VENDOR_NUMBER]
+    assert isinstance(vendor, vol.Required)
+    assert vendor.default == vol.UNDEFINED
+
+
+async def test_empty_vendor_is_rejected(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """The field is required; whitespace is not a vendor number."""
+    result = await hass.config_entries.flow.async_configure(
+        await _start(hass), _user_input(**{CONF_VENDOR_NUMBER: "   "})
+    )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_VENDOR_NUMBER: "invalid_vendor"}
+    assert aioclient_mock.call_count == 0
 
 
 async def test_garbage_pem_is_invalid_key(

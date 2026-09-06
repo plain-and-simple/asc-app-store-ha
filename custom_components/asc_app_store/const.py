@@ -15,9 +15,6 @@ CONF_VENDOR_NUMBER: Final = "vendor_number"
 # Options keys.
 CONF_SCAN_INTERVAL: Final = "scan_interval"
 
-# Studio vendor number, pre-filled so the form is one field shorter for us.
-DEFAULT_VENDOR_NUMBER: Final = "93606071"
-
 # Sales reports land a day or two late and are only kept briefly. Ten calendar
 # days is enough for a 7-day total plus a couple of missing-report holes
 # without hammering Apple on every refresh.
