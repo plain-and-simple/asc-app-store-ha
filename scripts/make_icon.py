@@ -12,7 +12,8 @@ S = 4
 W = 512
 C = W * S
 
-OUT = Path(__file__).resolve().parents[1] / "custom_components" / "asc_app_store" / "brand"
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "custom_components" / "asc_app_store" / "brand"
 
 BG_TOP = (10, 132, 255)
 BG_BOTTOM = (0, 64, 168)

@@ -46,5 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/ruff-action@v3
-      - run: ruff check custom_components tests
-      - run: ruff format --check custom_components tests
+      # ruff-action checks the whole tree; keep the follow-up commands in sync
+      # so a long line in scripts/ cannot pass locally and fail CI.
+      - run: ruff check custom_components tests scripts
+      - run: ruff format --check custom_components tests scripts
