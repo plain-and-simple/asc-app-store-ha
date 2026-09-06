@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import voluptuous as vol
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
+import voluptuous as vol
 
 from custom_components.asc_app_store.config_flow import STEP_USER_SCHEMA
 from custom_components.asc_app_store.const import (
