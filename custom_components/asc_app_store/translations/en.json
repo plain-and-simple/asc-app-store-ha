@@ -1,0 +1,86 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect App Store Connect",
+        "description": "Home Assistant needs an App Store Connect API key to read App Units and build versions.\n\nIn App Store Connect, open **Users and Access › Integrations › Keys** ({keys_url}), create a key with access to **App Manager** (or **Admin**) plus **Sales and Trends**, then paste the Key ID, Issuer ID and the contents of the `.p8` file below.\n\nThe vendor number is under **Agreements, Tax, and Banking**. This integration only ever *reads* sales reports and build metadata.",
+        "data": {
+          "key_id": "Key ID",
+          "issuer_id": "Issuer ID",
+          "private_key": "Private key (.p8)",
+          "vendor_number": "Vendor number"
+        },
+        "data_description": {
+          "key_id": "The 10-character Key ID shown next to the key in App Store Connect.",
+          "issuer_id": "The Issuer ID at the top of the Keys page.",
+          "private_key": "Paste the full PEM text of the AuthKey_XXXXXXXXXX.p8 file, including the BEGIN and END lines.",
+          "vendor_number": "Numeric vendor number from Agreements, Tax, and Banking. The studio default is 93606071."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reconnect App Store Connect",
+        "description": "App Store Connect is no longer accepting the stored API key. This usually means the key was revoked or a new .p8 was generated.\n\nCreate a new key under **Users and Access › Integrations › Keys** ({keys_url}) and paste it below. Your existing sensors and their recorded history are kept.",
+        "data": {
+          "key_id": "Key ID",
+          "issuer_id": "Issuer ID",
+          "private_key": "Private key (.p8)"
+        },
+        "data_description": {
+          "key_id": "Must belong to the same App Store Connect team as before.",
+          "issuer_id": "The Issuer ID at the top of the Keys page.",
+          "private_key": "Paste the full PEM text of the new .p8 file."
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "App Store Connect rejected that API key. Check the Key ID, Issuer ID and that the .p8 belongs to this key.",
+      "invalid_key": "That private key is not a valid ES256 .p8 PEM. Paste the whole file, including the BEGIN and END lines.",
+      "invalid_vendor": "Enter the numeric vendor number from Agreements, Tax, and Banking.",
+      "cannot_connect": "Could not reach App Store Connect. Check this machine's internet connection and try again.",
+      "unknown": "Something unexpected went wrong. The Home Assistant log has the details."
+    },
+    "abort": {
+      "already_configured": "This App Store Connect vendor has already been added.",
+      "reauth_successful": "App Store Connect is reconnected."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "App Store Connect options",
+        "description": "How often to refresh App Units and build versions.",
+        "data": {
+          "scan_interval": "Update interval"
+        },
+        "data_description": {
+          "scan_interval": "How often to ask App Store Connect for new data. Daily sales reports only land once a day, so checking more often than every few hours rarely shows you anything new."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "downloads_status": {
+        "name": "ASC Downloads Status"
+      },
+      "downloads_total_day": {
+        "name": "ASC Downloads Total Day"
+      },
+      "downloads_total_7d": {
+        "name": "ASC Downloads Total 7d"
+      },
+      "app_builds_status": {
+        "name": "ASC App Builds Status"
+      },
+      "downloads_day": {
+        "name": "Downloads day"
+      },
+      "downloads_7d": {
+        "name": "Downloads 7d"
+      },
+      "app_release": {
+        "name": "Release"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+Provider	Provider Country	SKU	Developer	Title	Version	Product Type Identifier	Units	Developer Proceeds	Begin Date	End Date	Customer Currency	Country Code	Currency of Proceeds	Apple Identifier	Customer Price	Promo Code	Parent Identifier	Subscription Period	Category	CMB	Device	Supported Platforms	Proceeds Reason	Preserved Pricing	Client	Order Type
+APPLE	US	plain.simple	Plain and Simple	Plain and Simple	1.2	1	5	0	09/05/2026	09/05/2026	USD	US	USD	1234567890	0			 	 	 	 	iPhone	iOS	 	 	 	 
+APPLE	GB	plain.simple	Plain and Simple	Plain and Simple	1.2	1	2	0	09/05/2026	09/05/2026	GBP	GB	GBP	1234567890	0			 	 	 	 	iPhone	iOS	 	 	 	 
+APPLE	US	plain.simple	Plain and Simple	Plain and Simple	1.2	7	99	0	09/05/2026	09/05/2026	USD	US	USD	1234567890	0			 	 	 	 	iPhone	iOS	 	 	 	 
+APPLE	US	plain.simple	Plain and Simple	Plain and Simple	1.2	7F	12	0	09/05/2026	09/05/2026	USD	US	USD	1234567890	0			 	 	 	 	iPhone	iOS	 	 	 	 
+APPLE	US	plain.simple	Plain and Simple	Plain and Simple	1.2	F7	3	0	09/05/2026	09/05/2026	USD	US	USD	1234567890	0			 	 	 	 	iPhone	iOS	 	 	 	 
+APPLE	US	studio.lab	Plain and Simple	Studio Lab	2.0	1F	4	0	09/05/2026	09/05/2026	USD	US	USD	9876543210	0			 	 	 	 	iPhone	iOS	 	 	 	 
+APPLE	US	studio.lab	Plain and Simple	Studio Lab	2.0	1T	1	0	09/05/2026	09/05/2026	USD	US	USD	9876543210	0			 	 	 	 
+APPLE	US	bundle.one	Plain and Simple	Studio Bundle	1.0	1-B	1	0	09/05/2026	09/05/2026	USD	US	USD	5555555555	0			 	 	 	 
+APPLE	US	mac.lab	Plain and Simple	Mac Lab	1.0	F1	2	0	09/05/2026	09/05/2026	USD	US	USD	4444444444	0			 	 	 	 
+APPLE	US	iap.coins	Plain and Simple	Studio Lab	2.0	IA1	80	0	09/05/2026	09/05/2026	USD	US	USD	9876543210	0			 	 	 	 
