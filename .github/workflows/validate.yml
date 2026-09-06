@@ -17,6 +17,10 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
+          # GitHub repo topics and the detected-license field live on the
+          # repository, not the branch. This repo is new; both land after
+          # main has LICENSE and someone adds the `homeassistant` topic.
+          ignore: topics license
 
   hassfest:
     name: hassfest
