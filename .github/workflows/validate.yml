@@ -1,0 +1,52 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Weekly, so a HACS or hassfest rule change surfaces before a release does.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  hacs:
+    name: HACS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
+        with:
+          category: integration
+          # GitHub repo topics and the detected-license field live on the
+          # repository, not the branch. This repo is new; both land after
+          # main has LICENSE and someone adds the `homeassistant` topic.
+          ignore: topics license
+
+  hassfest:
+    name: hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  tests:
+    name: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements_test.txt
+      - run: pytest -q
+
+  lint:
+    name: ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/ruff-action@v3
+      # ruff-action checks the whole tree; keep the follow-up commands in sync
+      # so a long line in scripts/ cannot pass locally and fail CI.
+      - run: ruff check custom_components tests scripts
+      - run: ruff format --check custom_components tests scripts

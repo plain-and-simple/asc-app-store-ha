@@ -1,0 +1,11 @@
+{
+  "domain": "asc_app_store",
+  "name": "App Store Connect",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/plain-and-simple/asc-app-store-ha",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/plain-and-simple/asc-app-store-ha/issues",
+  "version": "0.1.0"
+}
