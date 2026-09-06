@@ -40,6 +40,14 @@ def is_first_time_app_unit(product_type: str) -> bool:
     return identifier in FIRST_TIME_APP_UNITS
 
 
+def _optional_cell(cells: list[str], index: dict[str, int], name: str) -> str:
+    """Return a trimmed optional column, or empty if the row is short."""
+    position = index.get(name)
+    if position is None or position >= len(cells):
+        return ""
+    return cells[position].strip()
+
+
 def parse_report_date(raw: str) -> date | None:
     """Parse a sales-report Begin Date, which arrives as MM/DD/YYYY."""
     text = raw.strip()
@@ -77,10 +85,12 @@ def parse_sales_tsv(text: str) -> list[SalesRow]:
     if any(name not in index for name in required):
         return []
 
+    needed = max(index[name] for name in required)
+
     rows: list[SalesRow] = []
     for line in lines[1:]:
         cells = line.split("\t")
-        if len(cells) <= max(index.values()):
+        if len(cells) <= needed:
             continue
 
         product_type = cells[index["Product Type Identifier"]].strip()
@@ -97,12 +107,8 @@ def parse_sales_tsv(text: str) -> list[SalesRow]:
             continue
 
         title = cells[index["Title"]].strip()
-        sku = cells[index["SKU"]].strip() if "SKU" in index else ""
-        apple_id = (
-            cells[index["Apple Identifier"]].strip()
-            if "Apple Identifier" in index
-            else ""
-        )
+        sku = _optional_cell(cells, index, "SKU")
+        apple_id = _optional_cell(cells, index, "Apple Identifier")
         rows.append(
             SalesRow(
                 report_date=report_date,

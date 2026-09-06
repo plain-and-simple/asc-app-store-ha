@@ -73,6 +73,7 @@ class AscDownloadsStatusSensor(AscHubEntity, SensorEntity):
     def __init__(self, coordinator: AscCoordinator) -> None:
         """Initialise the downloads status sensor."""
         super().__init__(coordinator, "downloads_status", "asc_downloads_status")
+        self._attr_name = "ASC Downloads Status"
 
     @property
     def native_value(self) -> str | None:
@@ -108,6 +109,9 @@ class AscDownloadsTotalSensor(AscHubEntity, SensorEntity):
         )
         self._period = period
         self._attr_translation_key = f"downloads_total_{period}"
+        self._attr_name = (
+            "ASC Downloads Total Day" if period == "day" else "ASC Downloads Total 7d"
+        )
 
     @property
     def native_value(self) -> int | None:
@@ -139,6 +143,7 @@ class AscBuildsStatusSensor(AscHubEntity, SensorEntity):
     def __init__(self, coordinator: AscCoordinator) -> None:
         """Initialise the builds status sensor."""
         super().__init__(coordinator, "app_builds_status", "asc_app_builds_status")
+        self._attr_name = "ASC App Builds Status"
 
     @property
     def native_value(self) -> str | None:

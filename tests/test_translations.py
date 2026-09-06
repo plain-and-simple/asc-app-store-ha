@@ -56,7 +56,8 @@ def test_translation_keys_are_slugs() -> None:
         if not isinstance(node, dict):
             return
         for key, value in node.items():
-            if path.endswith((".state", "entity.sensor", "entity.button")) or ".options" in path:
+            entity_keys = path.endswith((".state", "entity.sensor", "entity.button"))
+            if entity_keys or ".options" in path:
                 assert re.fullmatch(r"[a-z0-9_-]+", key), f"{path}.{key} is not a slug"
             walk(value, f"{path}.{key}")
 

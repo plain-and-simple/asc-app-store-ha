@@ -7,7 +7,6 @@ from datetime import date
 import gzip
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -107,7 +106,10 @@ def versions_payload(version: str, build: str, build_id: str) -> dict[str, Any]:
             {
                 "type": "builds",
                 "id": build_id,
-                "attributes": {"version": build, "uploadedDate": "2026-08-01T11:00:00Z"},
+                "attributes": {
+                    "version": build,
+                    "uploadedDate": "2026-08-01T11:00:00Z",
+                },
             }
         ],
     }
@@ -145,6 +147,19 @@ def builds_payload(
     }
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _warmup_pycares_shutdown_thread() -> None:
+    """Start pycares' daemon thread before the first test snapshots threads.
+
+    The first aiohttp request starts ``_run_safe_shutdown_loop``. The HA
+    test plugin treats a new thread at teardown as a leak. Starting it at
+    session scope means every test already has it in ``threads_before``.
+    """
+    import pycares
+
+    pycares._shutdown_manager.start()
+
+
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(
     enable_custom_integrations: None,
@@ -155,11 +170,7 @@ def auto_enable_custom_integrations(
 
 @pytest.fixture
 def mock_asc(aioclient_mock: AiohttpClientMocker) -> AiohttpClientMocker:
-    """Serve apps, versions, TestFlight builds and a couple of sales days.
-
-    More-specific ``/v1/apps/{id}/...`` URLs are registered before
-    ``/v1/apps`` because the mocker prefix-matches.
-    """
+    """Serve apps, versions, TestFlight builds and a couple of sales days."""
     tsv = load_text("sales_mixed.tsv")
     day_tsv = gzip_tsv(tsv)
 
@@ -173,32 +184,7 @@ def mock_asc(aioclient_mock: AiohttpClientMocker) -> AiohttpClientMocker:
     )
     aioclient_mock.get(f"{API_BASE}/v1/apps", json=apps_payload())
 
-    # The builds list is one endpoint filtered by app id. Return both apps'
-    # TestFlight builds depending on the filter — the mocker prefix-matches
-    # the path, so we inspect the request in a fallback: two sequential
-    # registrations would collide. A single payload that tests pick apart
-    # is wrong; instead the client is called per app and we register the
-    # path once with a combined list, then rely on filter[app] matching
-    # being ignored. To keep each app distinct, the API client uses the
-    # same path with different params — register without params and let
-    # tests that need per-app TF data use the combined helper below only
-    # when they do not care. For setup we return a TF-ahead build for
-    # whichever app is asked; the client picks the max uploadedDate.
-    #
-    # Practical approach: mock /v1/builds with a payload that includes
-    # both, and accept that each app's request returns both builds. The
-    # client then picks the newest iOS build in that list — which would
-    # assign the same TF to both apps. So we cannot share one payload.
-    #
-    # We therefore stub async_get_testflight_builds in this fixture's
-    # companion patch? No — register nothing generic. Tests that hit the
-    # real client will get the last registered /v1/builds mock. The
-    # mocker returns the first matching mock. We register none here and
-    # instead patch nothing: we add a regex URL that cannot collide.
-    #
-    # Simplest working approach used below: the coordinator's fetch calls
-    # /v1/builds?filter[app]=ID. The mocker includes params in the match
-    # when they are provided.
+    # Same path, different filter[app] — the mocker matches a query subset.
     aioclient_mock.get(
         f"{API_BASE}/v1/builds",
         params={"filter[app]": APP_PLAIN},
@@ -256,13 +242,11 @@ async def setup_integration(
     hass: HomeAssistant,
     config_entry: MockConfigEntry,
     mock_asc: AiohttpClientMocker,
+    freezer,
 ) -> MockConfigEntry:
     """Set up the integration against the ASC fixtures and return its entry."""
+    freezer.move_to("2026-09-06T12:00:00+00:00")
     config_entry.add_to_hass(hass)
-    with patch(
-        "custom_components.asc_app_store.coordinator.date.today",
-        return_value=TEST_TODAY,
-    ):
-        assert await hass.config_entries.async_setup(config_entry.entry_id)
-        await hass.async_block_till_done()
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
     return config_entry

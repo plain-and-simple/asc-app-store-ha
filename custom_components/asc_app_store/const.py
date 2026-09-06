@@ -35,7 +35,5 @@ API_BASE: Final = "https://api.appstoreconnect.apple.com"
 FIRST_TIME_APP_UNITS: Final = frozenset({"1", "1F", "1T", "F1", "1-B"})
 UPDATE_PRODUCT_TYPES: Final = frozenset({"7", "7F", "F7"})
 
-ASC_KEYS_URL: Final = (
-    "https://appstoreconnect.apple.com/access/integrations/api"
-)
+ASC_KEYS_URL: Final = "https://appstoreconnect.apple.com/access/integrations/api"
 ASC_ANALYTICS_URL: Final = "https://appstoreconnect.apple.com/analytics"

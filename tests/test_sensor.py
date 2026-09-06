@@ -103,9 +103,7 @@ async def test_unique_ids_are_stable(
     entry_id = setup_integration.entry_id
 
     assert (
-        registry.async_get_entity_id(
-            "sensor", DOMAIN, f"{entry_id}_downloads_status"
-        )
+        registry.async_get_entity_id("sensor", DOMAIN, f"{entry_id}_downloads_status")
         == "sensor.asc_downloads_status"
     )
     assert (

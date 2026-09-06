@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from unittest.mock import patch
 
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -19,8 +18,6 @@ from custom_components.asc_app_store.const import (
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
-
-from .conftest import TEST_TODAY
 
 
 async def test_setup_and_unload(
@@ -60,12 +57,8 @@ async def test_a_revoked_key_starts_a_reauth_flow(
     mock_asc.clear_requests()
     mock_asc.get(f"{API_BASE}/v1/apps", status=401, json={"errors": []})
 
-    with patch(
-        "custom_components.asc_app_store.coordinator.date.today",
-        return_value=TEST_TODAY,
-    ):
-        await setup_integration.runtime_data.async_refresh()
-        await hass.async_block_till_done()
+    await setup_integration.runtime_data.async_refresh()
+    await hass.async_block_till_done()
 
     flows = [
         flow
@@ -94,18 +87,16 @@ async def test_the_configured_interval_is_used(
     hass: HomeAssistant,
     config_entry: MockConfigEntry,
     mock_asc: AiohttpClientMocker,
+    freezer,
 ) -> None:
     """An interval that silently ignores the option would be worse than no option."""
     config_entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
         config_entry, options={CONF_SCAN_INTERVAL: 90}
     )
-    with patch(
-        "custom_components.asc_app_store.coordinator.date.today",
-        return_value=TEST_TODAY,
-    ):
-        assert await hass.config_entries.async_setup(config_entry.entry_id)
-        await hass.async_block_till_done()
+    freezer.move_to("2026-09-06T12:00:00+00:00")
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
     assert config_entry.runtime_data.update_interval == timedelta(minutes=90)
 

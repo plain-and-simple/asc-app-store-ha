@@ -19,13 +19,15 @@ class AscHubEntity(CoordinatorEntity[AscCoordinator]):
 
     _attr_has_entity_name = False
 
-    def __init__(self, coordinator: AscCoordinator, suffix: str, object_id: str) -> None:
+    def __init__(
+        self, coordinator: AscCoordinator, suffix: str, object_id: str
+    ) -> None:
         """Attach this entity to the vendor's hub device."""
         super().__init__(coordinator)
         entry = coordinator.config_entry
         self._attr_unique_id = f"{entry.entry_id}_{suffix}"
         self._attr_translation_key = suffix
-        self._attr_suggested_object_id = object_id
+        self._suggested_id = object_id
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name="App Store Connect",
@@ -34,6 +36,11 @@ class AscHubEntity(CoordinatorEntity[AscCoordinator]):
             entry_type=DeviceEntryType.SERVICE,
             configuration_url=ASC_ANALYTICS_URL,
         )
+
+    @property
+    def suggested_object_id(self) -> str | None:
+        """Force the dashboard entity id, independent of the translated name."""
+        return self._suggested_id
 
 
 class AscAppEntity(CoordinatorEntity[AscCoordinator]):
@@ -59,7 +66,7 @@ class AscAppEntity(CoordinatorEntity[AscCoordinator]):
         entry = coordinator.config_entry
         self._slug = slug
         self._attr_unique_id = f"{entry.entry_id}_{slug}_{suffix}"
-        self._attr_suggested_object_id = object_id
+        self._suggested_id = object_id
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{entry.entry_id}_{slug}")},
             name=app_name,
@@ -67,3 +74,8 @@ class AscAppEntity(CoordinatorEntity[AscCoordinator]):
             model="iOS app",
             via_device=(DOMAIN, entry.entry_id),
         )
+
+    @property
+    def suggested_object_id(self) -> str | None:
+        """Force the dashboard entity id, independent of the translated name."""
+        return self._suggested_id

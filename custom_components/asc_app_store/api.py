@@ -29,7 +29,6 @@ from .models import (
     DownloadsSnapshot,
     SalesRow,
     aggregate_downloads,
-    empty_builds,
     empty_downloads,
     is_tf_ahead_of_live,
     lookback_dates,
@@ -86,9 +85,9 @@ class AscApi:
     def _token_for(self, now: int | None = None) -> str:
         """Return a cached JWT, or mint a new one if it is about to expire."""
         moment = int(time.time() if now is None else now)
+        expires_at = self._token_issued_at + JWT_LIFETIME_SECONDS
         still_valid = (
-            self._token is not None
-            and moment < self._token_issued_at + JWT_LIFETIME_SECONDS - TOKEN_REFRESH_SKEW_SECONDS
+            self._token is not None and moment < expires_at - TOKEN_REFRESH_SKEW_SECONDS
         )
         if still_valid and self._token is not None:
             return self._token
@@ -139,9 +138,13 @@ class AscApi:
                     )
                 return response.status, body, content_type
         except TimeoutError as err:
-            raise AscApiError(f"Timed out talking to App Store Connect at {url}") from err
+            raise AscApiError(
+                f"Timed out talking to App Store Connect at {url}"
+            ) from err
         except aiohttp.ClientError as err:
-            raise AscApiError(f"Could not reach App Store Connect at {url}: {err}") from err
+            raise AscApiError(
+                f"Could not reach App Store Connect at {url}: {err}"
+            ) from err
 
     async def _get_json(
         self, path: str, params: dict[str, str] | None = None
@@ -182,7 +185,9 @@ class AscApi:
 
         while url:
             body = await self._get_json(url, query)
-            data.extend(item for item in body.get("data") or [] if isinstance(item, dict))
+            data.extend(
+                item for item in body.get("data") or [] if isinstance(item, dict)
+            )
             included.extend(
                 item for item in body.get("included") or [] if isinstance(item, dict)
             )
@@ -278,9 +283,7 @@ class AscApi:
             except AscAuthError:
                 raise
             except AscApiError as err:
-                _LOGGER.warning(
-                    "Sales report for %s failed: %s", report_date, err
-                )
+                _LOGGER.warning("Sales report for %s failed: %s", report_date, err)
                 continue
 
             if text is None:
@@ -297,9 +300,7 @@ class AscApi:
                 latest = report_date
 
         if latest is None and not rows:
-            return empty_downloads(
-                "No daily sales reports in the lookback window"
-            )
+            return empty_downloads("No daily sales reports in the lookback window")
 
         return aggregate_downloads(rows, latest_date=latest)
 
@@ -345,12 +346,12 @@ class AscApi:
         chosen = max(versions, key=_created_date)
         attributes = chosen.get("attributes") or {}
         live_version = attributes.get("versionString")
-        build_ref = ((chosen.get("relationships") or {}).get("build") or {}).get(
-            "data"
-        )
+        build_ref = ((chosen.get("relationships") or {}).get("build") or {}).get("data")
         live_build = None
         if isinstance(build_ref, dict):
-            live_build = _included_attribute(included, "builds", build_ref.get("id"), "version")
+            live_build = _included_attribute(
+                included, "builds", build_ref.get("id"), "version"
+            )
         return (
             str(live_version) if live_version else None,
             str(live_build) if live_build else None,

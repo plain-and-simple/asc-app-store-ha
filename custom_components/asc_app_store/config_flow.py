@@ -50,9 +50,7 @@ STEP_USER_SCHEMA = vol.Schema(
         vol.Required(CONF_PRIVATE_KEY): TextSelector(
             TextSelectorConfig(multiline=True, type=TextSelectorType.TEXT)
         ),
-        vol.Required(
-            CONF_VENDOR_NUMBER, default=DEFAULT_VENDOR_NUMBER
-        ): TextSelector(),
+        vol.Required(CONF_VENDOR_NUMBER, default=DEFAULT_VENDOR_NUMBER): TextSelector(),
     }
 )
 
@@ -134,14 +132,17 @@ class AscConfigFlow(ConfigFlow, domain=DOMAIN):
         """Ask for the API key and confirm it works."""
         errors: dict[str, str] = {}
 
-        if user_input is not None:
-            if (validated := await self._async_validate(user_input, errors)) is not None:
-                await self.async_set_unique_id(validated[CONF_VENDOR_NUMBER])
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(
-                    title="App Store Connect",
-                    data=validated,
-                )
+        if (
+            user_input is not None
+            and (validated := await self._async_validate(user_input, errors))
+            is not None
+        ):
+            await self.async_set_unique_id(validated[CONF_VENDOR_NUMBER])
+            self._abort_if_unique_id_configured()
+            return self.async_create_entry(
+                title="App Store Connect",
+                data=validated,
+            )
 
         return self.async_show_form(
             step_id="user",

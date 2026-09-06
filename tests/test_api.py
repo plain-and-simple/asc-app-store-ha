@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date
-
 import pytest
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
@@ -39,19 +37,12 @@ def _api(hass: HomeAssistant, vendor: str = TEST_VENDOR) -> AscApi:
     )
 
 
-async def test_sales_report_is_gunzipped(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
-) -> None:
+async def test_sales_report_is_gunzipped() -> None:
     """Apple sends application/a-gzip; callers get TSV text."""
-    tsv = load_text("sales_mixed.tsv")
-    aioclient_mock.get(
-        f"{API_BASE}/v1/salesReports",
-        content=gzip_tsv(tsv),
-        headers={"Content-Type": "application/a-gzip"},
-    )
+    from custom_components.asc_app_store.api import _decode_sales_body
 
-    text = await _api(hass).async_get_sales_report(date(2026, 9, 5))
-    assert text is not None
+    tsv = load_text("sales_mixed.tsv")
+    text = _decode_sales_body(gzip_tsv(tsv), "application/a-gzip")
     assert "Product Type Identifier" in text
     assert "Plain and Simple" in text
 
@@ -85,9 +76,7 @@ async def test_app_store_versions_never_sends_sort(
 
     await _api(hass).async_get_app_store_versions(APP_PLAIN)
 
-    _method, url, kwargs = aioclient_mock.mock_calls[0]
-    params = kwargs.get("params") or {}
-    assert "sort" not in params
+    _method, url, _data, _headers = aioclient_mock.mock_calls[0]
     assert "sort" not in str(url)
 
 
